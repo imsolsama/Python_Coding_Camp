@@ -1,8 +1,23 @@
-# main.py
+import requests
+import tarfile
+import glob
 from YBIGTA.tokenizers import BPETokenizer, WordTokenizer
 
 def main(use_bpe, n_corpus, n_iter):
-    corpus = ["hug", "hun", "hup", "pun", "hup"]
+    url = "https://huggingface.co/datasets/cnn_dailymail/resolve/2d2c6100ccd17c0b215f85c38e36c4e7a5746425/data/cnn_stories.tgz"
+    response = requests.get(url)
+    with open('cnn_stories.tgz', 'wb') as f:
+        f.write(response.content)
+        
+    tar = tarfile.open('cnn_stories.tgz')
+    tar.extractall()
+    tar.close()
+    file_list = glob.glob('cnn/stories/*.story')
+    
+    corpus = []
+    for file in file_list:
+        with open(file, 'r', encoding='utf-8') as f:
+            corpus.append(f.read())
 
     if use_bpe:
         tokenizer = BPETokenizer(corpus, vocab_size=n_corpus)
